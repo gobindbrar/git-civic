@@ -1,0 +1,166 @@
+Upgrade the existing GIT Civic MVP by adding a REAL government-data integration using the official Legistar Web API.
+
+Do not redesign or rebuild the existing application. Preserve the current UI, routes, Civic Passport, RSVP, posting, and simulated verification functionality.
+
+GOAL:
+Replace the San Francisco Board of Supervisors demo listing with live official government data while keeping existing demo/sample meetings as fallbacks.
+
+Use the official Legistar API documentation:
+https://webapi.legistar.com/Help
+
+For San Francisco, use the Legistar client identifier:
+sfgov
+
+The official Legistar Events API is:
+https://webapi.legistar.com/v1/sfgov/Events
+
+Create a clean service module in the existing services/ directory for Legistar rather than placing API calls directly inside page/UI code.
+
+Implement the following:
+
+1. LIVE SAN FRANCISCO EVENTS
+
+Create a function that retrieves upcoming San Francisco government meetings from Legistar.
+
+Return normalized event objects containing, where available:
+
+- event ID
+- government body
+- meeting name
+- date
+- time
+- meeting location
+- agenda status
+- agenda URL
+- meeting details/source URL
+- body ID
+
+Display these live meetings on the Discover page.
+
+Clearly label them:
+
+"Official Source"
+
+and
+
+"Live Government Data"
+
+Do not label sample/demo meetings as live.
+
+If Legistar cannot be reached, fail gracefully and continue displaying the existing sample meetings.
+
+2. TODAY'S BOARD OF SUPERVISORS MEETING
+
+Make sure the application can display the real San Francisco Board of Supervisors meeting occurring:
+
+September 29, 2026
+2:00 PM
+Legislative Chamber, Room 250
+San Francisco City Hall
+1 Dr. Carlton B. Goodlett Place
+San Francisco, CA 94102
+
+Official meeting ID:
+1449004
+
+Official public meeting page:
+https://sfgov.legistar.com/MeetingDetail.aspx?GUID=82BD7CE6-C773-4BF3-A2FA-3A59A473DBB1&ID=1449004&Options=&Search=
+
+Do not hard-code meeting details when the corresponding data can be obtained from the official API. The URL above may be used as an official-source fallback.
+
+3. MEETING DETAILS + AGENDA ITEMS
+
+When a user clicks a live Legistar meeting, retrieve the individual event details and event items through the official Legistar API.
+
+For today's Board of Supervisors meeting, display real agenda items.
+
+Create a section:
+
+"Official Agenda"
+
+Show the agenda items in a clean scrollable list.
+
+For every agenda item, display where available:
+
+- file/matter number
+- title
+- type
+- status
+- agenda description
+
+Do NOT invent missing values.
+
+4. SOURCE TRANSPARENCY
+
+Every live government event should include:
+
+"Data source: Official Legistar public records"
+
+Include an external link/button:
+
+"View Official Source"
+
+The link should go to the official government source when available.
+
+Never present a generated or third-party URL as an official source.
+
+5. PREPARE FOR AI MEETING BRIEF
+
+Do not connect an LLM yet.
+
+Create a service interface/function that accepts:
+
+- meeting metadata
+- agenda items
+
+and returns a structured Meeting Brief object containing placeholders for:
+
+- meeting summary
+- key topics
+- why residents may care
+- participation information
+- citations/source references
+
+The existing UI should be able to consume this object later when we connect an AI model.
+
+For now, if no AI brief exists, display:
+
+"AI Meeting Brief is being prepared from the official agenda."
+
+Do not fabricate an AI summary.
+
+6. DEMO RELIABILITY
+
+Maintain a fallback mode so the hackathon demo still works if the external API goes down.
+
+When live data succeeds, visibly show:
+
+"LIVE"
+
+When fallback sample data is being shown, visibly show:
+
+"DEMO DATA"
+
+Do not falsely label demo data as live.
+
+7. TESTING
+
+After implementation:
+
+- run the app
+- verify the Discover page loads
+- verify real San Francisco events can load
+- verify today's September 29 Board of Supervisors meeting opens
+- verify agenda items display
+- verify the official source link works
+- verify sample events still work if the Legistar request fails
+- fix all runtime errors
+
+Do not connect OpenRouter, Band, Brave, Crusoe, GPS, or authentication during this step.
+
+When finished, tell me:
+1. which files were changed,
+2. whether the live Legistar API worked,
+3. how many agenda items were retrieved for meeting 1449004,
+4. whether fallback mode works,
+5. the exact URL of the working Replit preview.

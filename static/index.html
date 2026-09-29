@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f3f0e7">
+    <meta name="description" content="GIT Civic — Find it. Show up. Prove it. Discover civic meetings and build your Civic Passport.">
+    <title>GIT Civic — Get Involved Today</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <script src="/static/app.js" defer></script>
+  </head>
+  <body>
+    <div class="site-shell">
+      <header class="topbar">
+        <a class="brand" href="/" data-link aria-label="GIT Civic home">
+          <span class="brand-mark"><span></span><span></span><span></span></span>
+          <span class="brand-wordmark">GIT <b>CIVIC</b></span>
+        </a>
+        <div class="topbar-note">GET INVOLVED TODAY <span class="live-dot"></span> FIND IT. SHOW UP. PROVE IT.</div>
+        <nav class="topnav" aria-label="Main navigation">
+          <a href="/" data-link data-nav="home">Discover</a>
+          <a href="/passport" data-link data-nav="activity">Civic Passport</a>
+          <a href="/how-it-works" data-link data-nav="how">How It Works</a>
+          <a href="/about" data-link data-nav="about">About</a>
+          <a href="/passport" data-link class="profile-link" aria-label="Profile and privacy settings">Profile</a>
+          <a class="nav-create" href="/new" data-link><span aria-hidden="true">＋</span> Post an event</a>
+        </nav>
+        <button class="menu-toggle" id="menu-toggle" aria-label="Open menu" aria-expanded="false"><span></span><span></span></button>
+      </header>
+      <main id="app" tabindex="-1"></main>
+      <footer class="footer">
+        <a class="brand brand-small" href="/" data-link>
+          <span class="brand-mark"><span></span><span></span><span></span></span>
+          <span class="brand-wordmark">GIT <b>CIVIC</b></span>
+        </a>
+        <p>Find it. Show up. Prove it. · A nonpartisan civic participation demo.</p>
+        <span class="footer-right">DEMO DATA IS MARKED <span>·</span> PRIVATE BY DEFAULT</span>
+      </footer>
+    </div>
+    <div class="toast-region" id="toast-region" aria-live="polite" aria-atomic="true"></div>
+    <div id="modal-root"></div>
+  </body>
+</html>

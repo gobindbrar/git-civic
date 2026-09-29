@@ -1,4 +1,9 @@
 # Logs
+*.db
+*.db-shm
+*.db-wal
+.pythonlibs/
+__pycache__/
 logs
 *.log
 npm-debug.log*

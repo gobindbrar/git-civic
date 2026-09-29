@@ -1,0 +1,2 @@
+- [Legistar endpoint availability](legistar-endpoint-availability.md) — a working client API does not imply Events or agenda endpoints work; label official-site fallback separately.
+- [Civic AI provider availability](civic-ai-provider.md) — do not assume a listed model works with this project's OpenRouter key; verify a live cited request.
