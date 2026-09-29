@@ -16,6 +16,7 @@ from zoneinfo import ZoneInfo
 
 from flask import Flask, jsonify, request, send_from_directory
 from services.integrations import IntegrationError, fetch_meetings, fetch_agenda_items, generate_brief
+from services.band_brief import BandUnavailable, configured as band_configured, generate_band_brief
 from services.legistar import CITY as SF_CITY, SourceError, fetch_event_details, fetch_upcoming
 from services.meeting_brief import build_meeting_brief
 
@@ -290,7 +291,10 @@ def sync_feed():
                         {**meeting, "code_hash": hashlib.sha256(secrets.token_bytes(32)).hexdigest(), "created_at": now()},
                     )
             # A removed/cancelled upcoming event must not retain a checked-feed label.
-            for row in conn.execute("SELECT id FROM events WHERE source_status='verified_feed' AND starts_at>=?", (now(),)):
+            for row in conn.execute(
+                "SELECT id FROM events WHERE source_status='verified_feed' AND source_provider='' AND starts_at>=?",
+                (now(),),
+            ):
                 if row["id"] not in seen:
                     conn.execute("UPDATE events SET source_status='stale_feed' WHERE id=?", (row["id"],))
         feed_error = ""
@@ -439,25 +443,50 @@ def event_brief(event_id):
     if event["source_status"] not in ("verified_feed", "verified_site"):
         return error("A recently checked official source is required for an AI briefing.", 409)
     try:
-        with brief_lock:
-            cached = brief_cache.get(event_id)
-            if cached and cached[0] == event["source_checked_at"]:
-                return jsonify(brief=cached[1])
         if event["source_provider"].startswith("legistar:sfgov:"):
             details = fetch_event_details(event["source_record_id"], event["source_url"])
-            # Cite the exact official page's agenda rows; never use a submitted URL.
-            items = [{"id": str(i + 1), "title": (item.get("title") or item.get("description") or "")[:600]}
-                     for i, item in enumerate(details["agenda_items"])
+            # Bound the model input on long agendas and say exactly what was included.
+            # The IDs are page row numbers, not independent legislative file IDs.
+            items = [{"id": str(i + 1), "title": (item.get("title") or item.get("description") or "")[:240]}
+                     for i, item in enumerate(details["agenda_items"][:6])
                      if item.get("title") or item.get("description")]
         else:
             items = fetch_agenda_items(event["source_record_id"])
-        brief = generate_brief(event, items)
+        scope = (f"First {min(len(details['agenda_items']), 6)} of {len(details['agenda_items'])} official agenda rows"
+                 if event["source_provider"].startswith("legistar:sfgov:") else "")
+        evidence = {**event, "agenda_scope": scope} if scope else event
+        if not items:
+            raise IntegrationError("No published agenda items are available for a cited briefing.")
+        fingerprint = hashlib.sha256(json.dumps(
+            [event["title"], event["starts_at"], event["source_url"], scope, items],
+            sort_keys=True).encode()).hexdigest()
+        try:
+            # Band remains opt-in and experimental, never part of the submission demo path.
+            brief = (generate_band_brief(evidence, items)
+                     if os.environ.get("BAND_BRIEF_ENABLED") == "1" and band_configured() else None)
+        except BandUnavailable:
+            brief = None
+        if brief is None:
+            try:
+                brief = generate_brief(evidence, items)
+                brief.update(mode="fallback", source_verification="NOT RUN",
+                             civic_critic="NOT RUN", revision_requested=False,
+                             workflow=["Official government data retrieved"])
+            except IntegrationError:
+                with brief_lock:
+                    cached = brief_cache.get(event_id)
+                if not cached or cached[0] != fingerprint:
+                    raise
+                brief = {**cached[1], "mode": "cached", "source_checked_at": event["source_checked_at"]}
+                return jsonify(brief=brief)
         cited = set(brief.pop("cited_item_ids"))
         brief["citations"] = [{"title": item["title"], "url": event["source_url"], "item_id": item["id"]}
                               for item in items if item["id"] in cited]
         brief["source_checked_at"] = event["source_checked_at"]
+        if scope:
+            brief["agenda_scope"] = scope
         with brief_lock:
-            brief_cache[event_id] = (event["source_checked_at"], brief)
+            brief_cache[event_id] = (fingerprint, brief)
         return jsonify(brief=brief)
     except (IntegrationError, SourceError) as exc:
         return error(str(exc), 503)
