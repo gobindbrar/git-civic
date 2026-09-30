@@ -1,0 +1,28 @@
+kind = "slides"
+previewPath = "/git-civic-deck/"
+title = "GIT Civic — Presentation"
+description = "An eight-slide presentation of GIT Civic’s civic meeting discovery experience, live official-source example, evidence labels, architecture, and next steps."
+version = "1.0.0"
+id = "artifacts/git-civic-deck"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/git-civic-deck/" ]
+localPort = 19866
+
+[services.development]
+run = "pnpm --filter @workspace/git-civic-deck run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/git-civic-deck", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/git-civic-deck/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "19866"
+BASE_PATH = "/git-civic-deck/"

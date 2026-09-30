@@ -1,5 +1,16 @@
-# GIT Civic on Replit
+# GIT Civic
 
-Run the **Start application** workflow (`python main.py`). Flask binds to `0.0.0.0:5000`, serving the frontend and same-origin `/api` endpoints. Python dependencies are tracked in `pyproject.toml` and `uv.lock`. The SQLite database `civic.db` is local, initialized automatically, and gitignored. To use a different path, set `CIVIC_DB_PATH`.
+GIT Civic helps residents find public meetings and keep a private, evidence-labeled record of participation.
 
-No secrets are needed for the public San Francisco Legistar source (official website fallback if the Events API is unavailable) or the Seattle API feed. Optional OpenRouter AI briefs require `OPENROUTER_API_KEY` in Secrets. The sample meetings and sample Passport entries remain demonstration data. Community-submitted links are unverified; official-source provenance does not certify attendance or independently verify every notice detail. Authentication and GPS/document verification are not connected.
+## Run and operate
+
+- Start `artifacts/git-civic: web` for the original website at `/`. Its managed `PORT` is passed to the unchanged Flask app.
+- Python 3.13 dependencies: `bash artifacts/git-civic/install-deps.sh`; lockfile is in `artifacts/git-civic/uv.lock`.
+- Tests: `cd artifacts/git-civic && python3 -m unittest discover -s tests`.
+- SQLite data: `artifacts/git-civic/civic.db`, or override with `CIVIC_DB_PATH`. Do not migrate it to the scaffold PostgreSQL service.
+- `artifacts/api-server` is unused scaffold code mounted at `/__scaffold-api`, leaving `/api` to Flask.
+- The root website is deliberately Flask + static HTML/CSS/JS. Do not replace it with the generated React scaffold when adding a slides artifact.
+
+## Product and sources
+
+The original site, services, and data are in `artifacts/git-civic/`. Read its `README.md` for source-labeling, Legistar fallback, demo events, AI brief limitations, and privacy details. A deck can be created separately with its own preview path.

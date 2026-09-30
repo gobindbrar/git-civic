@@ -1,0 +1,5 @@
+# GIT Civic on Replit
+
+Run the **Start application** workflow (`python main.py`). Flask binds to `0.0.0.0:5000`, serving the frontend and same-origin `/api` endpoints. Python dependencies are tracked in `pyproject.toml` and `uv.lock`. The SQLite database `civic.db` is local, initialized automatically, and gitignored. To use a different path, set `CIVIC_DB_PATH`.
+
+No secrets are needed for the public San Francisco Legistar source (official website fallback if the Events API is unavailable) or the Seattle API feed. Optional OpenRouter AI briefs require `OPENROUTER_API_KEY` in Secrets. The sample meetings and sample Passport entries remain demonstration data. Community-submitted links are unverified; official-source provenance does not certify attendance or independently verify every notice detail. Authentication and GPS/document verification are not connected.

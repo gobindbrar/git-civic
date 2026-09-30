@@ -1,0 +1,44 @@
+modules = ["python-base-3.13", "nodejs-24"]
+[nix]
+channel = "stable-25_05"
+
+[agent]
+expertMode = true
+
+[[ports]]
+localPort = 5000
+externalPort = 80
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Start application"
+
+[[workflows.workflow]]
+name = "Start application"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python main.py"
+waitForPort = 5000
+
+[workflows.workflow.metadata]
+outputType = "webview"
+
+[deployment]
+deploymentTarget = "cloudrun"
+
+[deployment.run]
+args = ["gunicorn", "--workers", "1", "--threads", "4", "--bind", "0.0.0.0:5000", "main:app"]
+
+[postMerge]
+path = "scripts/post-merge.sh"
+timeoutMs = 120000

@@ -1,38 +1,24 @@
-modules = ["python-base-3.13", "nodejs-24"]
-[nix]
-channel = "stable-25_05"
+modules = ["nodejs-24", "python-base-3.13", "postgresql-16"]
 
-[agent]
-expertMode = true
+[deployment]
+router = "application"
+deploymentTarget = "autoscale"
 
-[[ports]]
-localPort = 5000
-externalPort = 80
+[deployment.postBuild]
+args = ["pnpm", "store", "prune"]
+env = { "CI" = "true" }
 
 [workflows]
 runButton = "Project"
 
-[[workflows.workflow]]
-name = "Project"
-mode = "parallel"
-author = "agent"
+[agent]
+stack = "PNPM_WORKSPACE"
+expertMode = true
 
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "Start application"
+[postMerge]
+path = "scripts/post-merge.sh"
+timeoutMs = 120000
 
-[[workflows.workflow]]
-name = "Start application"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "python main.py"
-waitForPort = 5000
-
-[workflows.workflow.metadata]
-outputType = "webview"
-
-[deployment]
-deploymentTarget = "vm"
-run = ["gunicorn", "--workers", "1", "--threads", "4", "--bind", "0.0.0.0:5000", "main:app"]
+[nix]
+channel = "stable-25_05"
+packages = ["postgresql"]

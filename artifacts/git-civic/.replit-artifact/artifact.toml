@@ -1,0 +1,26 @@
+kind = "web"
+previewPath = "/"
+title = "GIT Civic"
+description = "The original GIT Civic website for finding public meetings, participating, and tracking a private Civic Passport."
+version = "1.0.0"
+id = "artifacts/git-civic"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 21233
+
+[services.development]
+run = "pnpm run build:auth && python3 main.py"
+
+[services.production]
+[services.production.build]
+args = ["bash", "artifacts/git-civic/install-deps.sh"]
+
+[services.production.run]
+args = ["sh", "-c", "cd artifacts/git-civic && python3 -m gunicorn --workers 1 --threads 4 --bind 0.0.0.0:${PORT:-21233} main:app"]
+
+[services.env]
+PORT = "21233"
+BASE_PATH = "/"

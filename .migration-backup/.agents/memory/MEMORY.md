@@ -1,0 +1,4 @@
+- [Legistar endpoint availability](legistar-endpoint-availability.md) — a working client API does not imply Events or agenda endpoints work; label official-site fallback separately.
+- [Civic AI provider availability](civic-ai-provider.md) — do not assume a listed model works with this project's OpenRouter key; verify a live cited request.
+- [Band room replay](band-room-replay.md) — per-request agents must avoid replaying unfinished rooms, which can exhaust the free AI request quota.
+- [GitHub publishing](github-publishing.md) — connector API access does not repair the shell's Git HTTPS credential; verify tree equality if publishing via API.

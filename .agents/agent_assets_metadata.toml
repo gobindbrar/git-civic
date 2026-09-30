@@ -1,0 +1,9 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "gsC7N04ZQ38plAIL7DGwC"
+uri = "file://.local/outputs/GIT-Civic---Presentation.pdf"
+type = "pdf"
+title = "GIT Civic — Presentation.pdf"
+logical_id = "4a6c4eb9-8db7-4009-bf77-c0e837f84c34"

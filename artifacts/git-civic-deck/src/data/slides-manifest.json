@@ -1,0 +1,10 @@
+[
+  {"id":"d41bc139-caa4-413b-b150-f6f931629001","position":1,"filepath":"src/pages/slides/Title.tsx","title":"GIT Civic","description":"The product and purpose","speakerNotes":""},
+  {"id":"d41bc139-caa4-413b-b150-f6f931629002","position":2,"filepath":"src/pages/slides/Gap.tsx","title":"The participation gap","description":"Why participation is hard to navigate","speakerNotes":""},
+  {"id":"d41bc139-caa4-413b-b150-f6f931629003","position":3,"filepath":"src/pages/slides/Product.tsx","title":"One place to take part","description":"The product concept","speakerNotes":""},
+  {"id":"d41bc139-caa4-413b-b150-f6f931629004","position":4,"filepath":"src/pages/slides/Journey.tsx","title":"The resident journey","description":"Discover, understand, participate, passport","speakerNotes":""},
+  {"id":"d41bc139-caa4-413b-b150-f6f931629005","position":5,"filepath":"src/pages/slides/Meeting.tsx","title":"A real meeting, clearly sourced","description":"An official San Francisco meeting example","speakerNotes":""},
+  {"id":"d41bc139-caa4-413b-b150-f6f931629006","position":6,"filepath":"src/pages/slides/Trust.tsx","title":"Proof with clear limits","description":"Provenance and evidence labels","speakerNotes":""},
+  {"id":"d41bc139-caa4-413b-b150-f6f931629007","position":7,"filepath":"src/pages/slides/Stack.tsx","title":"Under the hood","description":"Architecture and current constraints","speakerNotes":""},
+  {"id":"d41bc139-caa4-413b-b150-f6f931629008","position":8,"filepath":"src/pages/slides/Next.tsx","title":"What comes next","description":"Next steps","speakerNotes":""}
+]

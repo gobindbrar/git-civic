@@ -1,0 +1,40 @@
+# GIT Civic — Get Involved Today
+
+**Find it. Show up. Prove it.**
+
+GIT Civic is a nonpartisan hackathon MVP for discovering public meetings, understanding how to participate, and keeping an evidence-labeled Civic Passport. Local civic information can be difficult to find or understand; this demo brings meeting details and participation tracking into one approachable place.
+
+## What works
+
+- A responsive landing page and discovery calendar with city/text, subject, and jurisdiction filters.
+- Live San Francisco meetings from the official Legistar API or public website fallback, public Seattle Legistar feed records (or another configured API client), and five **clearly labeled fictional demo listings**. Community members can add **unverified** optional links.
+- San Francisco meeting detail pages show published agenda items (file number, title, type, status, and description where available). Events also have neutral non-AI previews, optional cited AI briefs for checked official records, calendar invites, account-backed RSVPs, and Passport activity.
+- Passport attendance for official Legistar meetings can be recorded as **Self Reported** after the meeting begins; it is not externally verified. Community-created events continue to require an organizer code and are labeled **Organizer Code Confirmed**. Demo events cannot create real Passport attendance.
+- A private-by-default, account-backed Civic Passport with evidence labels, a separate sample history, and CSV export. Event owners can cancel listings without deleting RSVP or check-in history.
+- GIT Intelligence shows a workflow overview and, for checked official meetings, the status of an actual cited briefing request. The optional Band multi-agent path is **experimental** and disabled for the submission demo.
+
+## Run on Replit
+
+Start the **artifacts/git-civic: web** workflow, or run `cd artifacts/git-civic && python3 main.py`. The managed workflow supplies `PORT` and serves the original site at `/`. The app requires Replit-managed PostgreSQL (`DATABASE_URL`) and Clerk credentials configured through Replit; it does not write live data to local SQLite. `artifacts/git-civic/civic.db` is retained as a migration snapshot, not the runtime database. Python 3.13 dependencies are locked in this artifact's `pyproject.toml` and `uv.lock`; `bash artifacts/git-civic/install-deps.sh` installs them into Replit's Python interpreter.
+
+Run the test suite with `cd artifacts/git-civic && python3 -m unittest discover -s tests`. Tests use an isolated temporary SQLite database and do not connect to the live application database.
+
+No API key is needed for the official sources. The San Francisco `sfgov` Events API currently returns HTTP 400 because its public agenda status is not configured at the source, so `services/legistar.py` falls back to the official San Francisco Legistar calendar and meeting pages. It labels that path as an official-website fallback, **not** an API success. Set `CIVIC_LIVE_ENABLED=0` to disable San Francisco fetching. The independently configured Legistar API feed defaults to Seattle and refreshes when the calendar is requested (at most every 15 minutes); if refresh fails, checks older than 24 hours are shown as expired. Configure `LEGISTAR_CLIENT`, `LEGISTAR_CITY`, and `LEGISTAR_TIMEZONE` together for another API tenant; the client is a tenant name, not a URL. API fetches use `webapi.legistar.com`, and meeting pages/agenda PDFs are only marked checked when their domains and tenant match the feed record. Both paths establish source provenance, **not** independent fact-checking. Cancelled meetings are excluded from new API imports; always confirm details directly with the organizer.
+
+AI briefings require a signed-in Clerk account and a recently checked official meeting with published agenda items. The app sends retrieved official agenda-item titles, the meeting name, and date to the provider. Long San Francisco agendas are limited to their first 6 rows for the AI request, and the UI states the exact scope; the full published agenda remains visible separately. The output is labeled AI-generated and cites retrieved item IDs or numbered San Francisco website agenda rows linked to the official meeting page; unrecognized citations are rejected. Successfully generated briefs are stored in PostgreSQL by meeting and agenda fingerprint. A matching brief is returned before any provider call, and cached reads do not count against the limit of five new brief generations per user per hour. No AI request is made for a sample or community listing. If the provider or agenda is unavailable and no matching cache exists, the non-AI preview remains visible with an error.
+
+For AI briefing generation, put `CRUSOE_API_KEY` in Replit Secrets. The app checks Crusoe's live model catalog and prefers an available chat model for inference. The supplied legacy Intelligence API host can block requests at the edge; the app then uses Crusoe's documented Inference endpoint. `OPENROUTER_API_KEY` and optional `OPENROUTER_MODEL` (default `openrouter/free`) remain a backup if Crusoe is unavailable. Provider availability and quotas can change. Do not commit credentials or confidential meeting details.
+
+The existing Band integration is experimental, not production-ready: it can attempt Coordinator → Source Verifier → Agenda Analyst → Civic Critic → Coordinator handoffs in a Band room with real mentions, but a complete live approval loop has **not** been verified. It is off by default (`BAND_BRIEF_ENABLED=0`); a normal submission briefing uses the cited single-agent path and never displays “Powered by Band” unless a Band run actually completes.
+
+## Stack and planned architecture
+
+The working MVP uses Python/Flask, Replit-managed PostgreSQL for runtime persistence, Beautiful Soup for official San Francisco site parsing, and dependency-free HTML/CSS/JavaScript. The frontend calls JSON API endpoints in `main.py`; isolated tests use SQLite. `services/legistar.py` handles San Francisco records and `services/integrations.py` handles the other public Legistar API tenant plus Crusoe/OpenRouter briefing. `services/band_brief.py` contains the disabled-by-default experimental Band integration.
+
+## Privacy and verification
+
+Clerk sign-in is required for RSVPs, event management, check-ins, Passport access, and AI brief generation. Participation is associated directly with the signed-in account; the app no longer creates or claims browser-generated participant IDs. Passports are private by default. If an account owner enables sharing, the public view exposes only meeting title, city, jurisdiction, attendance time, evidence method, and demo status—not receipts or account identifiers. The only attendance methods are **Self Reported** for official Legistar meetings and **Organizer Code Confirmed** for community-created events. Self-reported attendance is not externally verified; organizer codes confirm possession of the code, not identity or government certification. The app does not offer GPS or document verification. Demo events cannot create real Passport attendance. Organizer cancellation preserves existing RSVP and Passport records. Avoid entering sensitive information in public event descriptions.
+
+Evidence labels represent **different standards**, not government certification: Self Reported means no external check; Organizer code confirms possession of a code but not identity; Presence Verified and Document Verified in this demo are **simulated only** and do not access GPS, accept documents, or review evidence. “Officially Verified” is a future level and is not awarded by this MVP. Meeting details, especially demo listings and briefing previews, must be confirmed with the relevant official public source before attending.
+
+The original license remains in `LICENSE`.

@@ -2,3 +2,6 @@
 - [Civic AI provider availability](civic-ai-provider.md) — do not assume a listed model works with this project's OpenRouter key; verify a live cited request.
 - [Band room replay](band-room-replay.md) — per-request agents must avoid replaying unfinished rooms, which can exhaust the free AI request quota.
 - [GitHub publishing](github-publishing.md) — connector API access does not repair the shell's Git HTTPS credential; verify tree equality if publishing via API.
+- [Artifact workflow working directory](artifact-workflow-cwd.md) — managed artifact commands already run inside the artifact; avoid an extra relative cd.
+- [Vite bundle module loading](vite-esm-script.md) — standalone builds can retain `import.meta`; load them as ES modules, not classic deferred scripts.
+- [Production database existence](production-db-existence.md) — a live deployment does not prove managed production PostgreSQL exists; verify the actual store first.
